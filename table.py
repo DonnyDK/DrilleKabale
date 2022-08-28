@@ -1,5 +1,5 @@
 from player import Player
-import time
+
 
 
 class Table(object):
@@ -68,8 +68,6 @@ class Table(object):
             self.checkField(field)
             return True
 
-        print('Wrong move!!')
-        time.sleep(.5)
         return False
 
     # CLI ONLY
