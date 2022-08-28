@@ -53,4 +53,3 @@ class Player(object):
             return False
 
         return True
-
