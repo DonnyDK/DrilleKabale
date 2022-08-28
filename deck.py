@@ -9,7 +9,6 @@ class Deck(object):
 
 
     def build(self, decs=1):
-        self.cards = []
         self.decks = decs
         for i in range(decs):
             for suit in ['C', 'S', 'D', 'H']:

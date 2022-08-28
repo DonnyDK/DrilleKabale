@@ -176,5 +176,5 @@ def main_cli(run):
                 os.system('cls')
                 player.hasTurn = False
 
-def main_gui():
+def main_gui(run):
     pass
