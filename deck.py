@@ -7,13 +7,6 @@ class Deck(object):
         self.decks = decks
         self.build(self.decks)
 
-    def show(self, leng=False):
-
-        if leng:
-            print(int(len(self.cards)))
-        else:
-            for card in self.cards:
-                print(card.show())
 
     def build(self, decs=1):
         self.cards = []

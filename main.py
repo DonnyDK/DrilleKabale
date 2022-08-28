@@ -1,5 +1,6 @@
-from app import main_cli as main
+from app import main_cli#, main_gui
 
 if __name__ == '__main__':
     run = True
-    main(run)
+    main_cli(run)
+    #main_gui()
