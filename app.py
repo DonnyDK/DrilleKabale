@@ -2,6 +2,8 @@ from table import Table
 from deck import Deck
 import os
 
+WM = 'Wrong Move!!!'
+ADD = 'Added'
 def setup():
     names = []
 
@@ -36,6 +38,7 @@ def main_cli(run):
             MOVE = True
             # Player draws cards
             table.draw(player, 5)
+
             while player.showStack().value > 12:
                 player.jokers.append(player.stack.pop())
 
@@ -80,7 +83,7 @@ def main_cli(run):
                     if dest == 1:
                         field = int(input(f'What field? (1 - {len(table.fields)}): '))
                         if table.addToField(field - 1, card):
-                            print('Added')
+                            print(ADD)
                         else:
                             player.hand.insert(choise - 1, card)
 
@@ -91,10 +94,10 @@ def main_cli(run):
 
                         if table.add_to_player_stack(card, field):
 
-                            print('Added')
+                            print(ADD)
                         else:
                             player.hand.insert(choise - 1, card)
-                            print('Wrong move!!!')
+                            print(WM)
 
                     # Play to Buffer
                     if dest == 3:
@@ -112,9 +115,9 @@ def main_cli(run):
                     card = player.jokers.pop()
 
                     if table.addToField(choise, card):
-                        print('Added')
+                        print(ADD)
                     else:
-                        print('Wrong Move!!!')
+                        print(WM)
                         player.jokers.append(card)
 
                 # Play from buffer
@@ -128,20 +131,20 @@ def main_cli(run):
                         field = int(input(f'What field? '))
 
                         if table.addToField(field - 1, card):
-                            print('Added')
+                            print(ADD)
                         else:
                             print('Wrocg move!!!')
                             player.buffer[choise].append(card)
 
                     except IndexError:
-                        print('Wrong move!!!')
+                        print(WM)
 
                 if move == 4:
 
                     try:
                         card = player.stack.pop()
                     except IndexError:
-                        print('Wrong move!!!')
+                        print(WM)
 
 
 
@@ -153,7 +156,7 @@ def main_cli(run):
                     if dest == 1:
                         field = int(input(f'What field? (1 - {len(table.fields)}): '))
                         if table.addToField(field - 1, card):
-                            print('Added')
+                            print(ADD)
                         else:
                             player.hand.insert(choise - 1, card)
 
@@ -164,10 +167,10 @@ def main_cli(run):
 
                         if table.add_to_player_stack(card, field):
 
-                            print('Added')
+                            print(ADD)
                         else:
                             player.stack.append(card)
-                            print('Wrong move!!!')
+                            print(WM)
 
 
 
