@@ -11,11 +11,14 @@ class Table(object):
         self.usedCards = []
         self.deck = deck
         self.build()
+        self.running = False
 
     def add_players(self):
         new_players = []
         for i in self.names:
             new_players.append(Player(i))
+
+
         return new_players
 
     def build(self):
