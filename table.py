@@ -1,3 +1,5 @@
+import random
+
 from player import Player
 
 
@@ -14,26 +16,34 @@ class Table(object):
         self.running = False
 
     def add_players(self):
-        new_players = []
+        new_players = {}
         for i in self.names:
-            new_players.append(Player(i))
-
+            new_players[i[1]] = Player(i[0], i[1])
 
         return new_players
 
     def build(self):
 
         # Build table stacks
-        for i in range(len(self.players * 4)):
-            self.fields.append([])
+        for i in self.players:
+            for _ in range(4):
+                self.fields.append([])
 
         # Build deck.
         self.deck.shuffle()
 
+        turn = random.randint(0, len(self.players.values()) - 1)
+        print(turn)
         # Build player stacks
-        for player in self.players:
+        for j, player in enumerate(self.players.values()):
             for i in range(15):
                 player.stack.append(self.deck.deal())
+
+            if j == turn:
+                player.hasTurn = True
+
+
+
 
     def draw(self, player, num=1):
 
@@ -86,7 +96,7 @@ class Table(object):
         names = []
         stacks = []
 
-        for i in self.players:
+        for i in self.players.values():
             if not i.hasTurn:
                 names.append(i.name)
                 stacks.append(i.showStack())
@@ -94,7 +104,7 @@ class Table(object):
         return names, stacks
 
     def add_to_player_stack(self, card, playerName):
-        for player in self.players:
+        for player in self.players.values():
             if player.name == playerName:
                 if card.suit == player.showStack().suit and card.value == player.showStack().value + 1:
                     player.stack.append(card)
