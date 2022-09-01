@@ -38,6 +38,7 @@ def handle_connection(conn, addr):
                 else:
                     if data == 'get':
                         conn.sendall(pickle.dumps(table))
+                        table = pickle.loads(conn.recv(16384))
 
                     else:
                         move(data)
@@ -50,8 +51,8 @@ def handle_connection(conn, addr):
 def start():
     global table, player_names
     count = 1
-    choice = 2
-    #choice = int(input('How many players are connecting? '))
+    #choice = 2
+    choice = int(input('How many players are connecting? '))
     print(f'Server address: {SERVER_IP}')
     player_names = []
     server.listen(choice)

@@ -2,8 +2,6 @@ import random
 
 from player import Player
 
-
-
 class Table(object):
 
     def __init__(self, names, deck):
@@ -41,9 +39,6 @@ class Table(object):
 
             if j == turn:
                 player.hasTurn = True
-
-
-
 
     def draw(self, player, num=1):
 
@@ -92,12 +87,12 @@ class Table(object):
 
         return self
 
-    def show_stacks(self):
+    def show_stacks(self, name2):
         names = []
         stacks = []
 
         for i in self.players.values():
-            if not i.hasTurn:
+            if not i.name == name2:
                 names.append(i.name)
                 stacks.append(i.showStack())
 
@@ -110,3 +105,25 @@ class Table(object):
                     player.stack.append(card)
                     return True
         return False
+
+    def from_hand(self, player, dist, source, local):
+
+        card = player.stack.pop(source - 1)
+
+        if dist == 'table':
+            if not self.addToField(local - 1, card):
+                player.hand.insert(source - 1, card)
+        elif dist == 'stack':
+            pass
+        elif dist == 'buffer':
+            pass
+
+
+    def from_joker(self):
+        pass
+
+    def from_buffer(self):
+        pass
+
+    def from_stack(self):
+        pass
