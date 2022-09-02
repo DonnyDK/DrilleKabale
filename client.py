@@ -1,7 +1,7 @@
 import os
 import socket
 import pickle
-import time
+import sys
 
 SERVER_IP = '192.168.1.100'
 PORT = 5659
@@ -26,20 +26,24 @@ def secure_input(msg):
     while True:
         try:
             move = input(msg)
-
             move = int(move)
             return move
+
         except ValueError:
             print('Please input a number ')
 
-while True:
 
-    client.send('get'.encode(FORMAT))
+
+while True:
+    source, src, dest, augment = 0, 0, 0, 0
+    get = 'get'
+    client.send(pickle.dumps(get))
     table = pickle.loads(client.recv(16384))
-    player = table.players[ID]
+    player = table.players[int(ID)]
+
     if table:
         os.system('cls')
-        print(f'Your player name: {name}\n')
+        print(f'Your player name: {name} ID: {ID}\n')
         table.showFields()
         print(LINE)
 
@@ -52,33 +56,53 @@ while True:
               f'{player.buffer[2]} ({len(player.buffer[2])})')
         print(LINE)
 
-        if player.hasTurn:
-            table.draw(player, 5)
 
-        if player.hand:
-            print(f'Your Hand: {player.showHand()}')
+        if player.hasTurn:
+            print(f'Your Hand: {player.showHand()}\n')
 
             ### Playing
 
             # Choose where to play from
-            # Players move
-
             playSource = ['1 = hand', '2 = joker', '3 = buffer', '4 = stack']
             source = secure_input(f'Where do you want to play from? ({playSource[0]} {playSource[1]} {playSource[2]} {playSource[3]}): ')
 
+            # Play from hand
             if source == 1:
                 scr = secure_input(f'What card do you wanna play? (1-{len(player.hand)}): ')
                 hand_dest = ['1 = table stack', '2 = other players stack', '3 = buffer']
                 dest = secure_input(f'Where do you want to play to? ({hand_dest[0]} {hand_dest[1]} {hand_dest[2]}) ')
 
                 if dest == 1:
-                    field = secure_input(f'What field? (1 - {len(table.fields)})')
-                    table.move()
+                    augment = secure_input(f'What field? (1 - {len(table.fields)})')
+                if dest == 2:
+                    augment = input(f'What player? (enter player name.)')
+                if dest == 3:
+                    augment = input('What buffer? (1-3)')
+
+            # Play from Joker
+            if source == 2:
+                dest = 0
+                augment = secure_input(f'What field? (1 - {len(table.fields)})')
+
+            #Play from buffer
+            if source == 3:
+                dest = input('What buffer? (1-3)')
+                augment = secure_input(f'What field? (1 - {len(table.fields)})')
+
+            # Play from stack
+            if source == 4:
+                stack_dest = ['1 = table stack', '2 = other players stack']
+                dest = secure_input(f'Where do you want to play to? ({stack_dest[0]} {stack_dest[1]}) ')
+
+                if dest == 1:
+                    augment = secure_input(f'What field? (1 - {len(table.fields)})')
+
+                if dest == 2:
+                    augment = input(f'What player? (enter player name.)')
+
+            data = source, scr, dest, augment, ID
+            print(sys.getsizeof(data))
+            client.send(pickle.dumps(data))
 
 
-
-
-
-
-        data = input('Press enter to continue')
-        client.sendall(pickle.dumps(table))
+    #del table
