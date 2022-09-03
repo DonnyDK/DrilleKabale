@@ -11,14 +11,12 @@ if IP_CHECK:
 else:
     SERVER_IP = socket.gethostbyname(socket.gethostname())
 
-PORT = 5659
+PORT = 5660
 ADDR = (SERVER_IP, PORT)
 FORMAT = 'utf-8'
 DISCONNECT_MSG = 'Disconnected!'
 LINE = '-----------------------------------------------------------'
 
-server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server.bind(ADDR)
 
 tables = {}
 gameId = 0
@@ -45,11 +43,13 @@ def handle_connection(conn, addr, gameId, ID):
                 break
 
 
-def start():
+def server():
     global gameId
+    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server.bind(ADDR)
     count = 1
-    #choice = int(input('How many players are connecting? '))
-    choice = 2
+    choice = int(input('How many players are connecting? '))
+    #choice = 2
     print(f'Server address: {SERVER_IP}')
     player_names = []
     server.listen(choice)
@@ -91,4 +91,4 @@ def start():
 
 
 
-start()
+server()

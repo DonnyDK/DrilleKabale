@@ -1,5 +1,6 @@
 from table import Table
 from deck import Deck
+
 import os
 
 WM = 'Wrong Move!!!'
@@ -21,8 +22,6 @@ def setup():
     table = Table(names, Deck(choice))
     os.system('cls')
     return table
-
-
 
 def main_cli(run):
 
@@ -181,3 +180,4 @@ def main_cli(run):
 
 def main_gui(run):
     pass
+

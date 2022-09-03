@@ -1,6 +1,4 @@
-from app import main_cli#, main_gui
+from app_network import main_network
 
 if __name__ == '__main__':
-    run = True
-    main_cli(run)
-    #main_gui(run)
+    main_network()
