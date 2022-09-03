@@ -24,87 +24,87 @@ def secure_input(msg):
         except ValueError:
             print('Please input a number ')
 
-def client():
-    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client.connect(ADDR)
 
-    client.send(name.encode(FORMAT))
-    ID = client.recv(1024).decode(FORMAT)
-    while True:
-        source, src, dest, augment = 0, 0, 0, 0
-        get = 'get'
-        client.send(pickle.dumps(get))
-        table = pickle.loads(client.recv(16384))
-        player = table.players[int(ID)]
+client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+client.connect(ADDR)
 
-        if table:
-            if table.running:
-                os.system('cls')
-                print(f'Your player name: {name} ID: {ID}\n')
-                table.showFields()
-                print(LINE)
+client.send(name.encode(FORMAT))
+ID = client.recv(1024).decode(FORMAT)
+while True:
+    source, src, dest, augment = 0, 0, 0, 0
+    get = 'get'
+    client.send(pickle.dumps(get))
+    table = pickle.loads(client.recv(16384))
+    player = table.players[int(ID)]
 
-                names, stacks = table.show_stacks(name)
-                for i, j in enumerate(names):
-                    if not j == name:
-                        print(f'{j}´s stack: {stacks[i]}')
-                print(f'\nYour stack: {player.showStack()} ({len(player.stack)}) | Jokers: {player.showJoker()} | '
-                      f'Buffers {player.showBuffer(1)} ({len(player.buffer[0])}) {player.showBuffer(2)} ({len(player.buffer[1])}) '
-                      f'{player.showBuffer(3)} ({len(player.buffer[2])})')
-                print(LINE)
+    if table:
+        if table.running:
+            os.system('cls')
+            print(f'Your player name: {name} ID: {ID}\n')
+            table.showFields()
+            print(LINE)
+
+            names, stacks = table.show_stacks(name)
+            for i, j in enumerate(names):
+                if not j == name:
+                    print(f'{j}´s stack: {stacks[i]}')
+            print(f'\nYour stack: {player.showStack()} ({len(player.stack)}) | Jokers: {player.showJoker()} | '
+                  f'Buffers {player.showBuffer(1)} ({len(player.buffer[0])}) {player.showBuffer(2)} ({len(player.buffer[1])}) '
+                  f'{player.showBuffer(3)} ({len(player.buffer[2])})')
+            print(LINE)
 
 
-                if player.hasTurn:
-                    print(f'Your Hand: {player.showHand()}\n')
+            if player.hasTurn:
+                print(f'Your Hand: {player.showHand()}\n')
 
-                    ### Playing
+                ### Playing
 
-                    # Choose where to play from
-                    playSource = ['1 = hand', '2 = joker', '3 = buffer', '4 = stack']
-                    source = secure_input(f'Where do you want to play from? ({playSource[0]} {playSource[1]} {playSource[2]} {playSource[3]}): ')
+                # Choose where to play from
+                playSource = ['1 = hand', '2 = joker', '3 = buffer', '4 = stack']
+                source = secure_input(f'Where do you want to play from? ({playSource[0]} {playSource[1]} {playSource[2]} {playSource[3]}): ')
 
-                    # Play from hand
-                    if source == 1:
-                        scr = secure_input(f'What card do you wanna play? (1-{len(player.hand)}): ')
-                        hand_dest = ['1 = table stack', '2 = other players stack', '3 = buffer']
-                        dest = secure_input(f'Where do you want to play to? ({hand_dest[0]} {hand_dest[1]} {hand_dest[2]}) ')
+                # Play from hand
+                if source == 1:
+                    scr = secure_input(f'What card do you wanna play? (1-{len(player.hand)}): ')
+                    hand_dest = ['1 = table stack', '2 = other players stack', '3 = buffer']
+                    dest = secure_input(f'Where do you want to play to? ({hand_dest[0]} {hand_dest[1]} {hand_dest[2]}) ')
 
-                        if dest == 1:
-                            augment = secure_input(f'What field? (1 - {len(table.fields)})')
-                        if dest == 2:
-                            augment = input(f'What player? (enter player name.)')
-                        if dest == 3:
-                            augment = input('What buffer? (1-3)')
+                    if dest == 1:
+                        augment = secure_input(f'What field? (1 - {len(table.fields)})')
+                    if dest == 2:
+                        augment = input(f'What player? (enter player name.)')
+                    if dest == 3:
+                        augment = input('What buffer? (1-3)')
 
-                    # Play from Joker
-                    if source == 2:
-                        dest = 0
+                # Play from Joker
+                if source == 2:
+                    dest = 0
+                    augment = secure_input(f'What field? (1 - {len(table.fields)})')
+
+                #Play from buffer
+                if source == 3:
+                    dest = input('What buffer? (1-3)')
+                    augment = secure_input(f'What field? (1 - {len(table.fields)})')
+
+                # Play from stack
+                if source == 4:
+                    stack_dest = ['1 = table stack', '2 = other players stack']
+                    dest = secure_input(f'Where do you want to play to? ({stack_dest[0]} {stack_dest[1]}) ')
+
+                    if dest == 1:
                         augment = secure_input(f'What field? (1 - {len(table.fields)})')
 
-                    #Play from buffer
-                    if source == 3:
-                        dest = input('What buffer? (1-3)')
-                        augment = secure_input(f'What field? (1 - {len(table.fields)})')
+                    if dest == 2:
+                        augment = input(f'What player? (enter player name.)')
 
-                    # Play from stack
-                    if source == 4:
-                        stack_dest = ['1 = table stack', '2 = other players stack']
-                        dest = secure_input(f'Where do you want to play to? ({stack_dest[0]} {stack_dest[1]}) ')
+                data = source, scr, dest, augment, ID
+                client.send(pickle.dumps(data))
 
-                        if dest == 1:
-                            augment = secure_input(f'What field? (1 - {len(table.fields)})')
-
-                        if dest == 2:
-                            augment = input(f'What player? (enter player name.)')
-
-                    data = source, scr, dest, augment, ID
-                    client.send(pickle.dumps(data))
-
-                else:
-                    time.sleep(1)
             else:
-                print('\nA player disconnected. Shutting down')
-                time.sleep(2)
-                exit()
+                time.sleep(1)
+        else:
+            print('\nA player disconnected. Shutting down')
+            time.sleep(2)
+            exit()
 
-client()
+

@@ -89,6 +89,4 @@ def server():
         if threading.active_count() == 1:
             break
 
-
-
 server()
