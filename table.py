@@ -7,12 +7,13 @@ class Table(object):
     def __init__(self, names, deck):
         self.names = names
         self.players = self.add_players()
-        self.ids = self.ids()
         self.fields = []
         self.usedCards = []
         self.deck = deck
+        self.ids = []
         self.build()
         self.running = False
+
 
     def add_players(self):
         new_players = {}
@@ -21,11 +22,17 @@ class Table(object):
 
         return new_players
 
-    def ids(self):
+
+    def ides(self):
         ids = []
-        for player in self.players.values():
-            ids.append(player.id)
-            return ids
+        for player in self.players:
+            ids.append(player)
+            self.ids = ids
+
+        turn = random.choice(self.ids)
+        self.players[turn].hasTurn = True
+        self.draw(turn, 5)
+
 
     def build(self):
 
@@ -37,15 +44,11 @@ class Table(object):
         # Build deck.
         self.deck.shuffle()
 
-        turn = random.randint(0, len(self.players.values()) - 1)
-        print(turn)
         # Build player stacks
         for j, player in enumerate(self.players.values()):
             for i in range(15):
                 player.stack.append(self.deck.deal())
 
-            if j == turn:
-                player.hasTurn = True
 
     def draw(self, player, num=1):
 
@@ -60,10 +63,12 @@ class Table(object):
 
         return True
 
+
     def checkField(self, field):
         if len(self.fields[field]) >= 12:
             self.usedCards = self.usedCards + self.fields[field]
             self.fields[field] = []
+
 
     def checkJoker(self, field, card):
         if card.isJoker:
@@ -76,6 +81,7 @@ class Table(object):
 
         return False
 
+
     def addToField(self, field, card):
 
         if card.value == len(self.fields[field]) + 1 or self.checkJoker(field, card):
@@ -85,7 +91,7 @@ class Table(object):
 
         return False
 
-    # CLI ONLY
+
     def showFields(self):
         count = 1
         for i in self.fields:
@@ -93,6 +99,7 @@ class Table(object):
             count += 1
 
         return self
+
 
     def show_stacks(self, name2):
         names = []
@@ -105,6 +112,7 @@ class Table(object):
 
         return names, stacks
 
+
     def add_to_player_stack(self, card, playerName):
         for player in self.players.values():
             if player.name == playerName:
@@ -112,6 +120,7 @@ class Table(object):
                     player.stack.append(card)
                     return True
         return False
+
 
     def from_hand(self, player, dist, source, local):
 
@@ -125,22 +134,31 @@ class Table(object):
         elif dist == 'buffer':
             pass
 
+
     def return_card(self, ide, card, src):
         self.players[ide].hand.insert(src - 1, card)
 
+
     def next(self, ide):
+        count = 0
+
+        for player in self.players.values():
+
+            if player.hasTurn:
+                next_player = count + 1
+                break
+            count += 1
+
         self.players[ide].hasTurn = False
-        for i, j in enumerate(self.ids):
-            if j == ide:
-                turn = i + 1
 
-        try:
-            next_player = self.ids[turn]
-        except IndexError:
-            next_player = self.ids[0]
+        while True:
+            try:
+                self.players[self.ids[next_player]].hasTurn = True
+                self.draw(self.ids[next_player], 5)
+                break
+            except IndexError:
+                next_player = 0
 
-        self.players[next_player].hasTurn = True
-        self.draw(self.players[next_player].id, 5)
 
     def move(self, ide, data):
 
@@ -150,9 +168,6 @@ class Table(object):
         if not self.players[ide].hasTurn:
             return False
 
-        print(source, src, dest, augment)
-        print(type(source), type(src), type(dest), type(augment), type(ide))
-        print(self.players[ide].hand)
         ### Playing
 
         # Play from hand
@@ -160,7 +175,6 @@ class Table(object):
             card = self.players[ide].hand.pop(src - 1)
 
             if dest == 1:
-
                 if not self.addToField(augment - 1, card):
                     self.return_card(ide, card, src)
 
@@ -187,7 +201,7 @@ class Table(object):
         if source == 3:
             card = self.players[ide].buffer[dest - 1].pop()
             if not self.addToField(augment - 1, card):
-                self.players[ide].buffer[dest].append(card)
+                self.players[ide].buffer[dest - 1].append(card)
 
         # Play from stack
         if source == 4:

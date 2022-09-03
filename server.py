@@ -1,15 +1,21 @@
 import pickle
 import socket
-import time
-from _thread import *
-
+import threading
 from deck import Deck
 from table import Table
-SERVER_IP = '192.168.1.100'
+
+IP_CHECK = input(f'Press enter if your ip is {socket.gethostbyname(socket.gethostname())}, or type your ip, followed by hitting enter: ')
+
+if IP_CHECK:
+    SERVER_IP = IP_CHECK
+else:
+    SERVER_IP = socket.gethostbyname(socket.gethostname())
+
 PORT = 5659
 ADDR = (SERVER_IP, PORT)
 FORMAT = 'utf-8'
 DISCONNECT_MSG = 'Disconnected!'
+LINE = '-----------------------------------------------------------'
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.bind(ADDR)
@@ -18,9 +24,6 @@ tables = {}
 gameId = 0
 
 def handle_connection(conn, addr, gameId, ID):
-
-    print(f'New connection. {addr[0]} connected.')
-
     connected = True
     while connected:
 
@@ -31,60 +34,61 @@ def handle_connection(conn, addr, gameId, ID):
                 if not data:
                     break
                 else:
+
                     if data == 'get':
                         conn.sendall(pickle.dumps(tables[gameId]))
-                        print('sending table')
-
                     else:
-                        print('recived Data', ID)
-                        print(data)
                         tables[gameId].move(ID, data)
-
-
             except EOFError as e:
-                print(e)
-                time.sleep(1)
-
-
+                print(tables[gameId].players[ID].name, DISCONNECT_MSG)
+                tables[gameId].running = False
+                break
 
 
 def start():
     global gameId
     count = 1
-    #choice = 2
-    choice = int(input('How many players are connecting? '))
+    #choice = int(input('How many players are connecting? '))
+    choice = 2
     print(f'Server address: {SERVER_IP}')
     player_names = []
     server.listen(choice)
     print('Server started. Waiting for players to connect.')
+    print(LINE)
 
     waiting = True
-    while waiting:
-        conn, addr = server.accept()
-        player_name = conn.recv(1024).decode(FORMAT)
-        ID = addr[1]
-        print(type(ID))
-        player_names.append((player_name, ID))
-        conn.send(str(ID).encode(FORMAT))
-        print(f'player named {player_name} added to the game.')
-        start_new_thread(handle_connection, (conn, addr, gameId, ID))
-        #time.sleep(0.1)
+    while True:
+        while waiting:
+            conn, addr = server.accept()
+            player_name = conn.recv(1024).decode(FORMAT)
+            ID = addr[1]
 
-        if len(player_names):
+            player_names.append((player_name, ID))
+            conn.send(str(ID).encode(FORMAT))
+            print(f'New connection.{player_name} connected from {addr[0]}.')
+            print(LINE)
+            threading.Thread(target=handle_connection, args=(conn, addr, gameId, ID)).start()
+            #time.sleep(0.1)
 
-            tables[gameId] = Table(player_names, Deck(choice))
-            print('Starting game!')
-            #table.players[random.random()]
-            tables[gameId].running = True
-            for player in tables[gameId].players:
-                if tables[gameId].players[player].hasTurn:
-                    tables[gameId].draw(player, 5)
-            gameId += 1
-            waiting = False
+            if len(player_names) == choice:
 
+                tables[gameId] = Table(player_names, Deck(choice))
+                print('Starting game!')
+                tables[gameId].running = True
+
+                for player in tables[gameId].players:
+                    if tables[gameId].players[player].hasTurn:
+                        tables[gameId].draw(tables[gameId].players[player].id, 5)
+
+                tables[gameId].ides()
+                gameId += 1
+                waiting = False
+
+            print(threading.active_count())
+
+        if threading.active_count() == 1:
+            break
 
 
 
 start()
-while True:
-   pass

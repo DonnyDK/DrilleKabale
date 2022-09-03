@@ -19,6 +19,11 @@ class Player(object):
     def showHand(self):
         return self.hand
 
+    def showBuffer(self, buffer):
+        if self.buffer[buffer - 1]:
+            return self.buffer[buffer - 1][-1]
+        return self.buffer[buffer - 1]
+
     def showJoker(self, show=False):
         if show:
             return self.jokers
