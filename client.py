@@ -2,18 +2,41 @@ import os
 import socket
 import pickle
 import time
+import settings
+import sys
 
-SERVER_IP = str(input('Enter servers ip: '))
+name = None
+SERVER_IP = None
+try:
+    SERVER_IP = sys.argv[1]
+except IndexError:
+    pass
+
+if not SERVER_IP:
+    SERVER_IP = str(input('Enter servers ip: '))
+
+if not SERVER_IP:
+    SERVER_IP = settings.SERVER_IP
+
+try:
+    name = sys.argv[2]
+except IndexError as e:
+    print(e)
+
+if not name:
+    name = str(input('Enter Name: '))
+
+if not name:
+    name = settings.name
+
+
 PORT = 5660
 ADDR = (SERVER_IP, PORT)
 FORMAT = 'utf-8'
 DISCONNECT_MSG = 'Disconnected!'
 LINE = '-----------------------------------------------------------'
 
-name = str(input('Name? '))
-print('Connecting to: ', SERVER_IP)
-
-
+source, scr, dest, augment = 0,0,0,0
 
 def secure_input(msg):
     while True:
@@ -43,7 +66,7 @@ while True:
             print(f'Your player name: {name} ID: {ID}\n')
             table.showFields()
             print(LINE)
-
+            src = 0
             names, stacks = table.show_stacks(name)
             for i, j in enumerate(names):
                 if not j == name:
@@ -102,9 +125,11 @@ while True:
 
             else:
                 time.sleep(1)
-        else:
-            print('\nA player disconnected. Shutting down')
-            time.sleep(2)
-            exit()
+
+    else:
+        print('\nA player disconnected. Shutting down')
+        time.sleep(2)
+        exit()
+
 
 

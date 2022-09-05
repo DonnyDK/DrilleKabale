@@ -45,8 +45,8 @@ class Player(object):
         if top_card.suit == card.suit and top_card.value == card.value - 1:
             self.stack.append(card)
             return True
-
-        return False
+        else:
+            return False
 
     def checkWon(self):
 

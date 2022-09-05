@@ -1,15 +1,24 @@
 import pickle
 import socket
 import threading
+import settings
+import sys
 from deck import Deck
 from table import Table
 
-IP_CHECK = input(f'Press enter if your ip is {socket.gethostbyname(socket.gethostname())}, or type your ip, followed by hitting enter: ')
 
-if IP_CHECK:
-    SERVER_IP = IP_CHECK
-else:
-    SERVER_IP = socket.gethostbyname(socket.gethostname())
+
+SERVER_IP = None
+try:
+    SERVER_IP = sys.argv[1]
+except IndexError:
+    pass
+
+if not SERVER_IP:
+    SERVER_IP = input(f'Press enter if your ip is {socket.gethostbyname(socket.gethostname())}, or type your ip, followed by hitting enter" ')
+if not SERVER_IP:
+    SERVER_IP = settings.SERVER_IP
+    #SERVER_IP = socket.gethostbyname(socket.gethostname())
 
 PORT = 5660
 ADDR = (SERVER_IP, PORT)
@@ -32,10 +41,10 @@ def handle_connection(conn, addr, gameId, ID):
                 if not data:
                     break
                 else:
-
                     if data == 'get':
                         conn.sendall(pickle.dumps(tables[gameId]))
                     else:
+                        print(f'{tables[gameId].players[ID].name} sender move: {data}')
                         tables[gameId].move(ID, data)
             except EOFError as e:
                 print(tables[gameId].players[ID].name, DISCONNECT_MSG)
@@ -65,7 +74,7 @@ def server():
 
             player_names.append((player_name, ID))
             conn.send(str(ID).encode(FORMAT))
-            print(f'New connection.{player_name} connected from {addr[0]}.')
+            print(f'New connection. {player_name} connected from {addr[0]}')
             print(LINE)
             threading.Thread(target=handle_connection, args=(conn, addr, gameId, ID)).start()
             #time.sleep(0.1)

@@ -163,7 +163,7 @@ class Table(object):
     def move(self, ide, data):
 
         source, src, dest, augment, ID = data
-        source, src, dest, augment = int(source), int(src), int(dest), int(augment)
+        #source, src, dest, augment = int(source), int(src), int(dest), int(augment)
 
         if not self.players[ide].hasTurn:
             return False
@@ -179,13 +179,16 @@ class Table(object):
                     self.return_card(ide, card, src)
 
             if dest == 2:
-                for i in self.players.values():
-                    if i.name == augment:
-                        if not self.add_to_player_stack(card, augment):
-                            self.return_card(card, src)
+                if ide in self.players.values():
+                    for i in self.players.values():
+                        if i.name == augment:
+                            if not self.add_to_player_stack(card, augment):
+                                self.return_card(ide, card, src)
+                else:
+                    self.return_card(ide, card, src)
 
             if dest == 3:
-                self.players[ide].buffer[augment - 1].append(card)
+                self.players[ide].buffer[int(augment) - 1].append(card)
                 self.next(ide)
 
             if len(self.players[ide].hand) < 1:
@@ -199,9 +202,9 @@ class Table(object):
 
         # Play from buffer
         if source == 3:
-            card = self.players[ide].buffer[dest - 1].pop()
+            card = self.players[ide].buffer[int(dest) - 1].pop()
             if not self.addToField(augment - 1, card):
-                self.players[ide].buffer[dest - 1].append(card)
+                self.players[ide].buffer[int(dest) - 1].append(card)
 
         # Play from stack
         if source == 4:

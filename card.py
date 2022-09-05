@@ -5,6 +5,7 @@ class Card(object):
         self.gfx_front = self.set_gfx_front()
         self.gfx_back = 'gfx/rear.png'
         self.isJoker = self.isJoker()
+        self.back = True
 
     def isJoker(self):
         if self.value > 12:
@@ -21,7 +22,7 @@ class Card(object):
         return self.show()
 
     def set_gfx_front(self):
-        return f'gfx/{self.value, self.suit[0]}.png'
+        return f'gfx/{self.value}{self.suit[0]}.png'
 
     def show(self):
         if self.value == 1:
