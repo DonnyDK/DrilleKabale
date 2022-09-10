@@ -52,13 +52,13 @@ client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 client.connect(ADDR)
 
 client.send(name.encode(FORMAT))
-ID = client.recv(1024).decode(FORMAT)
+ID = int(client.recv(1024).decode(FORMAT))
 while True:
     source, src, dest, augment = 0, 0, 0, 0
     get = 'get'
     client.send(pickle.dumps(get))
     table = pickle.loads(client.recv(16384))
-    player = table.players[int(ID)]
+    player = table.players[ID]
 
     if table:
         if table.running:

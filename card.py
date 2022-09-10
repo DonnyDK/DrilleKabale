@@ -2,6 +2,7 @@ class Card(object):
     def __init__(self, suit, val):
         self.suit = suit
         self.value = val
+        self.name = f'{self.value}/{self.suit.upper()}'
         self.gfx_front = self.set_gfx_front()
         self.gfx_back = 'gfx/rear.png'
         self.isJoker = self.isJoker()
@@ -12,17 +13,17 @@ class Card(object):
             return True
         return False
 
-    def __unicode__(self):
-        return self.show()
-
-    def __str__(self):
-        return self.show()
-
-    def __repr__(self):
-        return self.show()
+    # def __unicode__(self):
+    #     return self.show()
+    #
+    # def __str__(self):
+    #     return self.show()
+    #
+    # def __repr__(self):
+    #     return self.show()
 
     def set_gfx_front(self):
-        return f'gfx/{self.value}{self.suit[0]}.png'
+        return f'{self.value}{self.suit[0].lower()}'
 
     def show(self):
         if self.value == 1:

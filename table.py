@@ -2,6 +2,7 @@ import random
 
 from player import Player
 
+
 class Table(object):
 
     def __init__(self, names, deck):
@@ -14,14 +15,12 @@ class Table(object):
         self.build()
         self.running = False
 
-
     def add_players(self):
         new_players = {}
         for i in self.names:
             new_players[int(i[1])] = Player(i[0], i[1])
 
         return new_players
-
 
     def ides(self):
         ids = []
@@ -33,11 +32,10 @@ class Table(object):
         self.players[turn].hasTurn = True
         self.draw(turn, 5)
 
-
     def build(self):
 
         # Build table stacks
-        for i in self.players:
+        for _ in self.players:
             for _ in range(4):
                 self.fields.append([])
 
@@ -48,7 +46,6 @@ class Table(object):
         for j, player in enumerate(self.players.values()):
             for i in range(15):
                 player.stack.append(self.deck.deal())
-
 
     def draw(self, player, num=1):
 
@@ -63,12 +60,10 @@ class Table(object):
 
         return True
 
-
     def checkField(self, field):
         if len(self.fields[field]) >= 12:
             self.usedCards = self.usedCards + self.fields[field]
             self.fields[field] = []
-
 
     def checkJoker(self, field, card):
         if card.isJoker:
@@ -81,7 +76,6 @@ class Table(object):
 
         return False
 
-
     def addToField(self, field, card):
 
         if card.value == len(self.fields[field]) + 1 or self.checkJoker(field, card):
@@ -91,15 +85,13 @@ class Table(object):
 
         return False
 
-
     def showFields(self):
         count = 1
         for i in self.fields:
-            print(f'Field {count}: {i}' )
+            print(f'Field {count}: {i}')
             count += 1
 
         return self
-
 
     def show_stacks(self, name2):
         names = []
@@ -112,7 +104,6 @@ class Table(object):
 
         return names, stacks
 
-
     def add_to_player_stack(self, card, playerName):
         for player in self.players.values():
             if player.name == playerName:
@@ -120,7 +111,6 @@ class Table(object):
                     player.stack.append(card)
                     return True
         return False
-
 
     def from_hand(self, player, dist, source, local):
 
@@ -134,11 +124,10 @@ class Table(object):
         elif dist == 'buffer':
             pass
 
-
     def return_card(self, ide, card, src):
         self.players[ide].hand.insert(src - 1, card)
 
-
+    # noinspection PyUnboundLocalVariable
     def next(self, ide):
         count = 0
 
@@ -159,20 +148,19 @@ class Table(object):
             except IndexError:
                 next_player = 0
 
-
     def move(self, ide, data):
 
         source, src, dest, augment, ID = data
-        #source, src, dest, augment = int(source), int(src), int(dest), int(augment)
+        # source, src, dest, augment = int(source), int(src), int(dest), int(augment)
 
         if not self.players[ide].hasTurn:
             return False
 
-        ### Playing
-
+        # #### Playing
+        self.draw(self.players[ide].id, 5)
         # Play from hand
         if source == 1:
-            card = self.players[ide].hand.pop(src - 1)
+            card = self.players[ID].hand.pop(src - 1)
 
             if dest == 1:
                 if not self.addToField(augment - 1, card):
@@ -188,7 +176,7 @@ class Table(object):
                     self.return_card(ide, card, src)
 
             if dest == 3:
-                self.players[ide].buffer[int(augment) - 1].append(card)
+                self.players[ID].buffer[int(augment) - 1].append(card)
                 self.next(ide)
 
             if len(self.players[ide].hand) < 1:
