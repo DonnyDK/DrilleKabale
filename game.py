@@ -326,8 +326,8 @@ class Game:
         x += new
         if self.table.players[self.ID].jokers:
             for card in self.table.players[self.ID].jokers:
-
                 self.main_window.blit(self.cards[card.name], (x, y))
+
         else:
             self.main_window.blit(self.placeholder, (x, y))
 
