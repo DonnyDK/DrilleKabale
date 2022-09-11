@@ -30,8 +30,9 @@ class Game:
         self.CARD_BACK = self.scaler('gfx/Back_Red_2.png', self.CARD_TUP)
 
         # Opponent area settings
-        self.OPPONENT_AREA_PADDING = 4 * self.CARD_PADDING
-        self.OPPONENT_AREA_WIDTH = (3 * self.CARD_WIDTH) + self.OPPONENT_AREA_PADDING
+
+        self.OPPONENT_AREA_WIDTH = (3 * self.CARD_WIDTH) + (4 * self.CARD_PADDING)
+
         self.OPPONENT_AREA_BUFFER_SIZE = 10
         self.OPPONENT_AREA_ICON_TUP = (self.OPPONENT_AREA_WIDTH / 5, self.OPPONENT_AREA_WIDTH / 5)
 
@@ -48,26 +49,30 @@ class Game:
         self.PLAYER_AREA_BUFFER_SIZE = self.OPPONENT_AREA_BUFFER_SIZE
         self.PLAYER_AREA_HAND_AREA_SIZE = (5 * self.CARD_WIDTH) + (self.CARD_X_PAD * 6)
 
+        # Hand area settings
+        self.HAND_WIDTH = (5 * self.CARD_WIDTH) + (5 * self.CARD_PADDING)
+        self.HAND_HEIGHT = self.CARD_HEIGHT + (2 * self.CARD_PADDING)
+
         # Window settings
         self.BG = self.scaler('gfx/wood1.png', (self.WIDTH, self.HEIGHT))
         self.main_window = self.define_window()
 
-        # Game settings
 
         # GFX Loading
         self.icons = self.load_icons()
         self.placeholder = self.scaler('gfx/placeholder.png', self.CARD_TUP)
-        #self.placeholder = self.placeholder.set_alpha(100)
+        self.placeholder.set_alpha(100)
         self.numbers = self.load_numbers()
         self.cards = self.load_cards()
 
-        # for i in range(5):
-        #     for player in self.play_order:
-        #         data = (1, random.randint(1, 5), 3, random.randint(1, 3), self.table.players[player])
-        #
-        #         if self.table.players[player].hasTurn:
-        #             #self.table.draw(self.table.players[player].id, 5)
-        #             self.table.move(player, data)
+        for i in range(15):
+            for player in self.play_order:
+                data = (1, random.randint(1, 5), 3, random.randint(1, 3), player)
+                #data = (1, random.randint(1, 5), 3, 2, player)
+
+                if self.table.players[player].hasTurn:
+                    #self.table.draw(self.table.players[player].id, 5)
+                    self.table.move(player, data)
 
 
 
@@ -154,9 +159,9 @@ class Game:
 
     def other_player_buffer(self, x, y, ID):
 
-        x += self.CARD_PADDING
+        x += self.CARD_PADDING / 2
         y += self.CARD_PADDING
-
+        NY = y
         for buffer in self.table.players[ID].buffer:
             if len(buffer) < 1:
                 pic = self.placeholder
@@ -165,14 +170,15 @@ class Game:
 
             elif len(buffer) <= self.OPPONENT_AREA_BUFFER_SIZE:
                 for buf in buffer:
-                    self.main_window.blit(self.cards[buf.gfx_front], (x, y))
+                    self.main_window.blit(self.cards[buf.name], (x, y))
                     y += self.CARD_OVERLAY
 
             else:
                 for buf in buffer[-self.OPPONENT_AREA_BUFFER_SIZE:]:
-                    self.main_window.blit(self.cards[buf.gfx_front],(x, y))
+                    self.main_window.blit(self.cards[buf.name],(x, y))
                     y += self.CARD_OVERLAY
 
+            y = NY
             x += self.CARD_WIDTH + self.CARD_PADDING
 
     def other_player_stack(self, x, y, player):
@@ -197,8 +203,9 @@ class Game:
             if self.table.players[player].id != self.ID:
 
                 ###To be changed to actual player area###
-                area = pg.Surface((self.OPPONENT_AREA_WIDTH, self.OPPONENT_AREA_WIDTH * 1.5))
-                self.main_window.blit(area, (x, y))
+                area = pg.Surface((self.OPPONENT_AREA_WIDTH + self.CARD_PADDING, self.OPPONENT_AREA_WIDTH * 1.5))
+                area.set_alpha(150)
+                self.main_window.blit(area, (FX, FY))
                 #########################################
 
                 # Draws opponents buffers
@@ -222,6 +229,7 @@ class Game:
 
                 # Draws opponents stack
                 stack_x = x + self.OPPONENT_AREA_WIDTH - self.OPPONENT_AREA_ICON_TUP[0] -(self.CARD_WIDTH + self.CARD_PADDING)
+                y += self.CARD_PADDING
                 self.other_player_stack(stack_x, y, player)
                 x = FX
                 y = FY
@@ -254,7 +262,7 @@ class Game:
         # Draws the deck
         x = (self.WIDTH / 2) - (self.CARD_WIDTH /2)
         y = NY + (self.CARD_HEIGHT / 2)
-        for card in table.deck.cards:
+        for _ in table.deck.cards:
             self.main_window.blit(self.CARD_BACK, (x, y))
 
         # Draws table stacks
@@ -264,8 +272,68 @@ class Game:
         x = self.WIDTH - (self.TABLE_AREA_STACKS_SIDE_WIDTH / 2) - (self.TABLE_AREA_STACKS_SIDE_DRAW_WIDTH / 2)
         self.draw_table_stack(x, y,count)
 
+    def player_buffer(self, x, y, ID):
+
+        x += self.PAD
+        NY = y
+
+        for buffer in self.table.players[ID].buffer:
+            if len(buffer) < 1:
+                pic = self.placeholder
+                pic.set_alpha(100)
+                self.main_window.blit(pic, (x, y))
+
+            elif len(buffer) <= self.OPPONENT_AREA_BUFFER_SIZE:
+                for buf in buffer:
+                    self.main_window.blit(self.cards[buf.name], (x, y))
+                    y -= self.CARD_OVERLAY
+
+            else:
+                for buf in buffer[-self.OPPONENT_AREA_BUFFER_SIZE:]:
+                    self.main_window.blit(self.cards[buf.name], (x, y))
+                    y -= self.CARD_OVERLAY
+            y = NY
+            x += self.CARD_WIDTH + (self.CARD_PADDING / 2)
+
+
     def hand_area(self):
-        pass
+        x = (self.WIDTH / 2) - (self.HAND_WIDTH / 2)
+        y = self.HEIGHT - self.HAND_HEIGHT
+        bg = pg.Surface((self.HAND_WIDTH, self.HAND_HEIGHT))
+        bg.set_alpha(100)
+        self.main_window.blit(bg, (x, y))
+        x += self.CARD_PADDING / 2
+        y += self.CARD_PADDING
+        for card in self.table.players[self.ID].hand:
+            self.main_window.blit(self.cards[card.name], (x, y))
+            x += self.CARD_PADDING + self.CARD_WIDTH
+
+        self.player_buffer(0, y, self.ID)
+        new = (self.WIDTH / 2) + (self.HAND_WIDTH / 2)
+        new = self.WIDTH - new
+        new = new / 2
+
+        x = (self.WIDTH / 2) + (self.HAND_WIDTH / 2) + (new / 6)
+
+        if self.table.players[self.ID].stack:
+            for card in self.table.players[self.ID].stack:
+
+                self.main_window.blit(self.cards[card.name], (x, y))
+        else:
+            self.main_window.blit(self.placeholder, (x, y))
+
+
+        x += new
+        if self.table.players[self.ID].jokers:
+            for card in self.table.players[self.ID].jokers:
+
+                self.main_window.blit(self.cards[card.name], (x, y))
+        else:
+            self.main_window.blit(self.placeholder, (x, y))
+
+
+
+
 
 
 
@@ -281,7 +349,7 @@ class Game:
             self.draw_background()
             self.other_player_area()
             self.table_area()
-            #self.hand_area()
+            self.hand_area()
             # NY = 15
             # for buf in self.table.players[self.ID].buffer[0]:
             #     pic = self.scaler(buf.gfx_front, self.CARD_SIZE)

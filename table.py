@@ -151,13 +151,12 @@ class Table(object):
     def move(self, ide, data):
 
         source, src, dest, augment, ID = data
-        # source, src, dest, augment = int(source), int(src), int(dest), int(augment)
 
         if not self.players[ide].hasTurn:
             return False
 
         # #### Playing
-        self.draw(self.players[ide].id, 5)
+        #self.draw(self.players[ide].id, 5)
         # Play from hand
         if source == 1:
             card = self.players[ID].hand.pop(src - 1)
@@ -180,7 +179,7 @@ class Table(object):
                 self.next(ide)
 
             if len(self.players[ide].hand) < 1:
-                self.draw(self.players[ide], 5)
+                self.draw(self.players[ide].id, 5)
 
         # Play from Joker
         if source == 2:

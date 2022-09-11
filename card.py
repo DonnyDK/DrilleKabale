@@ -13,14 +13,14 @@ class Card(object):
             return True
         return False
 
-    # def __unicode__(self):
-    #     return self.show()
-    #
-    # def __str__(self):
-    #     return self.show()
-    #
-    # def __repr__(self):
-    #     return self.show()
+    def __unicode__(self):
+        return self.show()
+
+    def __str__(self):
+        return self.show()
+
+    def __repr__(self):
+        return self.show()
 
     def set_gfx_front(self):
         return f'{self.value}{self.suit[0].lower()}'
