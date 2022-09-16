@@ -65,7 +65,7 @@ class Game:
         self.numbers = self.load_numbers()
         self.cards = self.load_cards()
 
-        for i in range(15):
+        for i in range(5):
             for player in self.play_order:
                 data = (1, random.randint(1, 5), 3, random.randint(1, 3), player)
                 #data = (1, random.randint(1, 5), 3, 2, player)
@@ -345,6 +345,8 @@ class Game:
                     pg.display.quit()
                     pg.quit()
                     exit()
+
+
 
             self.draw_background()
             self.other_player_area()

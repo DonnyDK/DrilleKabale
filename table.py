@@ -187,6 +187,7 @@ class Table(object):
             if not self.addToField(augment - 1, card):
                 self.players[ide].jokers.append(card)
 
+
         # Play from buffer
         if source == 3:
             card = self.players[ide].buffer[int(dest) - 1].pop()
