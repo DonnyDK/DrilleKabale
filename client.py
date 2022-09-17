@@ -54,7 +54,7 @@ client.connect(ADDR)
 client.send(name.encode(FORMAT))
 ID = int(client.recv(1024).decode(FORMAT))
 while True:
-    source, src, dest, augment = 0, 0, 0, 0
+    source, scr, dest, augment = 0, 0, 0, 0
     get = 'get'
     client.send(pickle.dumps(get))
     table = pickle.loads(client.recv(16384))
@@ -66,7 +66,6 @@ while True:
             print(f'Your player name: {name} ID: {ID}\n')
             table.showFields()
             print(LINE)
-            src = 0
             names, stacks = table.show_stacks(name)
             for i, j in enumerate(names):
                 if not j == name:

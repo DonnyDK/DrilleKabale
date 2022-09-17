@@ -16,6 +16,13 @@ class Game:
         self.HEIGHT = self.WIDTH
         self.PAD = self.WIDTH / 180
         self.clock = pg.time.Clock()
+        self.source = 0
+        self.src = 0
+        self.dest = 0
+        self.augment = 0
+        self.locations = []
+        self.counter = 0
+
 
         # Game rule settings
         self.play_order = self.play_order_func()
@@ -240,14 +247,17 @@ class Game:
         rows = 2
         cols = int((len(self.table.fields) / 2) / rows)
         NX = x
-
+        counter = 0
         for rows in range(rows):
             for col in range(cols):
+                self.locations[self.counter] = [NX, NX + self.CARD_WIDTH, y, y + self.CARD_HEIGHT, 2, 0]
+                self.counter += 1
                 if len(self.table.fields[count]) > 0:
                     for card in self.table.fields[count]:
                         self.main_window.blit(self.cards[card.gfx_front], (NX, y))
                 else:
                     self.main_window.blit(self.placeholder, (NX, y))
+                counter += 1
                 NX += self.CARD_WIDTH + self.CARD_PADDING
             NX = x
             y += self.CARD_HEIGHT + self.CARD_PADDING
@@ -302,12 +312,18 @@ class Game:
         bg = pg.Surface((self.HAND_WIDTH, self.HAND_HEIGHT))
         bg.set_alpha(100)
         self.main_window.blit(bg, (x, y))
+
+        # Hand
         x += self.CARD_PADDING / 2
         y += self.CARD_PADDING
         for card in self.table.players[self.ID].hand:
             self.main_window.blit(self.cards[card.name], (x, y))
+
+
+
             x += self.CARD_PADDING + self.CARD_WIDTH
 
+        # Stack
         self.player_buffer(0, y, self.ID)
         new = (self.WIDTH / 2) + (self.HAND_WIDTH / 2)
         new = self.WIDTH - new
@@ -322,20 +338,29 @@ class Game:
         else:
             self.main_window.blit(self.placeholder, (x, y))
 
-
+        # Joker stack
         x += new
         if self.table.players[self.ID].jokers:
             for card in self.table.players[self.ID].jokers:
                 self.main_window.blit(self.cards[card.name], (x, y))
+                self.locations[self.counter] = [x, x + self.CARD_WIDTH, y, y + self.CARD_HEIGHT, 2, 0]
+                self.counter += 1
 
         else:
             self.main_window.blit(self.placeholder, (x, y))
 
 
-
-
-
-
+    def mouse_click(self, location):
+        for i in self.locations:
+            if location[0] >= i[0] and not location[0] >= i[1]:
+                if location[1] >= i[2] and not location[1] >= i[3]:
+                    if self.source == 0:
+                        self.source = i[4]
+                        self.augment = i[5]
+                        #print(i[4])
+                    else:
+                        self.dest = i[4]
+                        self.src = i[5]
 
 
     def main_loop(self):
@@ -346,7 +371,10 @@ class Game:
                     pg.quit()
                     exit()
 
-
+                elif event.type == pg.MOUSEBUTTONDOWN:
+                    location = pg.mouse.get_pos()
+                    self.mouse_click(location)
+                    #print(location)
 
             self.draw_background()
             self.other_player_area()
@@ -357,7 +385,7 @@ class Game:
             #     pic = self.scaler(buf.gfx_front, self.CARD_SIZE)
             #     self.main_window.blit(pic, (15, NY))
             #     NY += 10
-
+            print(self.source, self.augment)
             pg.display.update()
             self.clock.tick(60)
 

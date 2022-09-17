@@ -67,7 +67,7 @@ class Table(object):
 
     def checkJoker(self, field, card):
         if card.isJoker:
-            if len(self.fields[field]) == 0:
+            if len(self.fields[field]) == - 1: # change back to 0
                 return False
             if len(self.fields[field]) == 11:
                 return False
@@ -124,8 +124,8 @@ class Table(object):
         elif dist == 'buffer':
             pass
 
-    def return_card(self, ide, card, src):
-        self.players[ide].hand.insert(src - 1, card)
+    def return_card(self, ide, card, scr):
+        self.players[ide].hand.insert(scr - 1, card)
 
     # noinspection PyUnboundLocalVariable
     def next(self, ide):
@@ -150,7 +150,7 @@ class Table(object):
 
     def move(self, ide, data):
 
-        source, src, dest, augment, ID = data
+        source, scr, dest, augment, ID = data
 
         if not self.players[ide].hasTurn:
             return False
@@ -159,20 +159,20 @@ class Table(object):
         #self.draw(self.players[ide].id, 5)
         # Play from hand
         if source == 1:
-            card = self.players[ID].hand.pop(src - 1)
+            card = self.players[ID].hand.pop(scr - 1)
 
             if dest == 1:
                 if not self.addToField(augment - 1, card):
-                    self.return_card(ide, card, src)
+                    self.return_card(ide, card, scr)
 
             if dest == 2:
                 if ide in self.players.values():
                     for i in self.players.values():
                         if i.name == augment:
                             if not self.add_to_player_stack(card, augment):
-                                self.return_card(ide, card, src)
+                                self.return_card(ide, card, scr)
                 else:
-                    self.return_card(ide, card, src)
+                    self.return_card(ide, card, scr)
 
             if dest == 3:
                 self.players[ID].buffer[int(augment) - 1].append(card)
